@@ -3,7 +3,7 @@ import re, os, urllib2, requests
 
 block_conffile = 'blocked.conf'
 
-#blocklists array is in the format of [ [ URL, file format], ...]. File format is either: "hostlist" is list of domains or "hostfile" is a standard posix hostfile
+#blocklists array is in the format of [ [ URL, file format], ...]. File format is either, "hostlist": a list of domains, or "hostfile": a standard posix hostfile
 blocklists = [
     ["https://pgl.yoyo.org/adservers/serverlist.php?hostformat=nohtml&mimetype=plaintext", "hostlist"],
     ["https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts", "hostsfile"],
@@ -12,7 +12,6 @@ blocklists = [
 
 def is_valid_hostname(hostname):
     if 4 < len(hostname) < 256:
-        #hostname = hostname[:-1] if hostname[-1] == "."
         allowed = re.compile("(?!-)[A-Z\d-]{1,63}(?<!-)$", re.IGNORECASE)
         return all(allowed.match(x) for x in hostname.split("."))
     return False
@@ -42,5 +41,4 @@ def download_lists():
 with open(block_conffile, 'w') as f:
   for fqdn in download_lists():
     if is_valid_hostname(fqdn):
-      #f.write('zone "{0}" {{ type master; notify no; file "db.blocked"; }};\n'.format(fqdn))
       f.write('zone "{0}" {{ type master; notify no; file "db.blocked"; }};\n'.format(fqdn))
