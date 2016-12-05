@@ -6,8 +6,7 @@ block_conffile = 'blocked.conf'
 #blocklists array is in the format of [ [ URL, file format], ...]. File format is either, "hostlist": a list of domains, or "hostfile": a standard posix hostfile
 blocklists = [
     ["https://pgl.yoyo.org/adservers/serverlist.php?hostformat=nohtml&mimetype=plaintext", "hostlist"],
-    ["https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts", "hostsfile"],
-    []
+    ["https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts", "hostsfile"]
 ]
 
 def is_valid_hostname(hostname):
@@ -18,24 +17,18 @@ def is_valid_hostname(hostname):
 
 def download_lists():
     fqdns = []
-    for blocklist in blocklists:
-        if len(blocklist) == 0:
-            continue
-
-        url, list_format  = blocklist
-
-        res = urllib2.urlopen(url)
+    for bl_url, bl_format in blocklists:
+        res = urllib2.urlopen(bl_url)
         res_text = res.read()
         if res.getcode() == 200 and len(res_text) < 1048576:
             lines = res_text.splitlines()
-            if list_format == "hostsfile":
+            if bl_format == "hostsfile":
                 for line in lines:
                     if "0.0.0.0" in line:
                         fqdns.append(line.split(' ')[1].lower())
-            elif list_format == "hostlist":
+            elif bl_format == "hostlist":
                 for line in lines:
                         fqdns.append(line.lower())
-    print len(fqdns)
     return set(fqdns)
 
 with open(block_conffile, 'w') as f:
